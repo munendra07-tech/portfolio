@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const SKILLS = [
+  { cat: "Backend & AI Agents", items: ["FastAPI", "MCP", "Qdrant", "RAG", "LLM Evals", "PostgreSQL", "MySQL", "Docker", "GitHub Actions", "pytest", "React"] },
   { cat: "Languages & Cloud", items: ["Python", "SQL", "Bash", "AWS EC2/S3", "Git", "Linux"] },
   { cat: "ML / AI Frameworks", items: ["TensorFlow", "Keras", "Scikit-learn", "Flower", "FATE", "HuggingFace", "OpenCV", "Flask"] },
   { cat: "Data Science", items: ["Pandas", "NumPy", "Matplotlib", "Seaborn", "Power BI", "NLTK"] },
@@ -9,14 +10,38 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    id: "federated", num: "01", title: "Federated Fraud Detection", subtitle: "Privacy-Preserving ML System", year: "2024",
+    id: "crashtest", num: "01", title: "agent-crashtest", subtitle: "Reliability Testing for AI Agents", year: "2026", icon: "⬢",
+    link: "https://github.com/munendra07-tech/agent-crashtest",
+    desc: "Crash-tests an AI agent's MCP tool calls. When a tool's response is lost, did the refund happen once, twice, or not at all? A local fake refund tool and a database as ground truth turn the answer into a PASS/FAIL report for CI.",
+    stats: [{ val: "MCP", label: "Tool calls" }, { val: "5", label: "Trials per run" }, { val: "CI", label: "PASS / FAIL" }],
+    tech: ["Python", "MCP", "PostgreSQL", "Docker", "GitHub Actions", "pytest"],
+    bullets: ["Injects a lost-response fault after the sink commits, then counts real refunds from the database instead of trusting the agent's report", "Ships a self-test with a safe and an unsafe control agent so the harness itself can be trusted", "Published as a versioned open-source package (MIT) with CI, releases and Docker images"],
+  },
+  {
+    id: "memory", num: "02", title: "memory-assistant", subtitle: "Long-Term Memory for LLM Chat", year: "2026", icon: "◈",
+    link: "https://github.com/munendra07-tech/memory-assistant",
+    desc: "FastAPI chat service that remembers facts about each user across conversations, stored in Qdrant, plus an evaluation suite that measures how well it remembers.",
+    stats: [{ val: "Qdrant", label: "Vector DB" }, { val: "Per-user", label: "Isolation" }, { val: "Evals", label: "Measured" }],
+    tech: ["Python", "FastAPI", "Qdrant", "RAG", "LLM Evals", "GitHub Actions"],
+    bullets: ["Recalls relevant memories by embedding search before answering, and stores new facts after each message", "Replaces changed facts in place and skips repeats, so memory stays clean", "Every read and write is filtered by user, so one user can never see another's memory"],
+  },
+  {
+    id: "dalal", num: "03", title: "Dalal Street Pro", subtitle: "Indian Stock Portfolio Tracker", year: "2026", icon: "▣",
+    link: "https://github.com/munendra07-tech/dalal-street-pro",
+    desc: "Full-stack portfolio tracker for the Indian market: live P&L, a BUY/SELL trade engine with charges, SIP planning, a stock screener and automatic tax classification.",
+    stats: [{ val: "JWT", label: "Auth" }, { val: "SIP", label: "Planner" }, { val: "STCG/LTCG", label: "Tax report" }],
+    tech: ["FastAPI", "MySQL", "React", "JWT", "SQL Views", "Vercel"],
+    bullets: ["Live portfolio P&L computed in a SQL view, with day-gain tracking", "Trade engine for CNC, MIS and NRML orders with automatic STT and brokerage", "Screener, dividend calendar, IPO tracker and benchmark comparison against NIFTY 50"],
+  },
+  {
+    id: "federated", num: "04", icon: "⬡", title: "Federated Fraud Detection", subtitle: "Privacy-Preserving ML System", year: "2024",
     desc: "Architected a distributed fraud detection system that trains across financial institutions without centralising raw data — privacy by design, not as an afterthought.",
     stats: [{ val: "4%", label: "F1 gain" }, { val: "35%", label: "Dim. reduction" }, { val: "2", label: "Frameworks" }],
     tech: ["Flower", "FATE", "FedProx", "PSO", "Differential Privacy", "Matplotlib"],
     bullets: ["FedProx outperformed FedAvg by 4% F1-score on non-IID data with faster client convergence", "Reduced feature space 35% using Particle Swarm Optimisation without loss of predictive power", "Enforced end-to-end data confidentiality via differential privacy mechanisms"],
   },
   {
-    id: "stroke", num: "02", title: "Brain Stroke Detection", subtitle: "Medical Imaging via CNN", year: "2024",
+    id: "stroke", num: "05", icon: "◇", title: "Brain Stroke Detection", subtitle: "Medical Imaging via CNN", year: "2024",
     desc: "Deep learning classifier for brain stroke detection — built to handle brutal class imbalance of real clinical datasets, deployed as a production inference API.",
     stats: [{ val: "93%", label: "Accuracy" }, { val: "REST", label: "Flask API" }, { val: "ROC", label: "Validated" }],
     tech: ["TensorFlow", "Keras", "OpenCV", "Flask", "Transfer Learning", "Data Augmentation"],
@@ -41,6 +66,7 @@ const TIMELINE = [
   { year: "Sep 2024", title: "🏆 TechVortex 2.0 — 1st Place", sub: "National Hackathon · Symbiosis Institute of Technology, Pune", type: "award" },
   { year: "Mar 2025", title: "Patent Filed & Published", sub: "AI-Enhanced Firefighting Drone · IP India #202541019069", type: "patent" },
   { year: "2025", title: "B.Tech Graduate", sub: "Artificial Intelligence & Data Science · Woxsen University", type: "edu" },
+  { year: "2026", title: "Open-source: agent-crashtest v0.2.1", sub: "Released a reliability testing tool for AI agents, plus memory-assistant and Dalal Street Pro", type: "work" },
 ];
 
 function useInView(threshold = 0.08) {
@@ -131,7 +157,7 @@ function ProjectCard({ p, i }) {
           <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(20px,2.5vw,26px)", fontWeight: 700, color: "#fff", marginBottom: 4 }}>{p.title}</h3>
           <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{p.subtitle}</div>
         </div>
-        <div style={{ width: 46, height: 46, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{p.num === "01" ? "⬡" : "◈"}</div>
+        <div style={{ width: 46, height: 46, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{p.icon}</div>
       </div>
       <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, color: "rgba(255,255,255,0.45)", lineHeight: 1.8, marginBottom: 28, fontWeight: 300 }}>{p.desc}</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28, padding: "18px 0", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
@@ -150,6 +176,7 @@ function ProjectCard({ p, i }) {
           </li>
         ))}
       </ul>
+      {p.link && <a href={p.link} target="_blank" rel="noreferrer" className="cta-b" style={{ padding: "8px 16px", fontSize: 12, marginBottom: 20 }}>View on GitHub ↗</a>}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {p.tech.map(t => <span key={t} style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, padding: "4px 10px", borderRadius: 4, border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.35)" }}>{t}</span>)}
       </div>
@@ -185,7 +212,7 @@ export default function Portfolio() {
   const [tx, setTx] = useState(0); const [ty, setTy] = useState(0);
   const name1 = useTypewriter("B V", 130, 400);
   const name2 = useTypewriter("Munendra", 90, 900);
-  const role = useTypewriter("Data Scientist", 70, 2000);
+  const role = useTypewriter("AI & Backend Engineer", 70, 2000);
 
   useEffect(() => {
     const s = () => setScrollY(window.scrollY);
@@ -300,7 +327,7 @@ export default function Portfolio() {
           </div>
 
           <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, color: "rgba(255,255,255,0.45)", lineHeight: 1.9, maxWidth: 540, marginBottom: 40, fontWeight: 300 }}>
-            Patent-holding AI graduate & national hackathon champion. Building <span style={{ color: "#fff", fontWeight: 400 }}>privacy-preserving ML systems</span> at the intersection of federated learning, deep learning, and real-world impact.
+            Patent-holding AI graduate & national hackathon champion. Building <span style={{ color: "#fff", fontWeight: 400 }}>reliable AI agents and backend systems</span>: testing how tools fail, giving assistants measurable memory, and shipping everything with tests and CI.
           </p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 40 }}>
@@ -455,7 +482,7 @@ export default function Portfolio() {
           <FadeIn>
             <div className="sec-tag">06 — Contact</div>
             <h2 className="sec-h">Let's build<br /><em>something real.</em></h2>
-            <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, color: "rgba(255,255,255,0.38)", lineHeight: 1.85, maxWidth: 440, marginBottom: 52, fontWeight: 300 }}>Open to Data Scientist, ML Engineer, and AI Analyst roles across India. Working on something ambitious? Let's talk.</p>
+            <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, color: "rgba(255,255,255,0.38)", lineHeight: 1.85, maxWidth: 440, marginBottom: 52, fontWeight: 300 }}>Open to AI Engineer, ML Engineer, Backend and Data Scientist roles across India. Working on something ambitious? Let's talk.</p>
           </FadeIn>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10, maxWidth: 620 }}>
             {[
@@ -479,7 +506,7 @@ export default function Portfolio() {
       </section>
 
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "rgba(255,255,255,0.15)", letterSpacing: "0.08em" }}>© 2025 B V MUNENDRA</span>
+        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "rgba(255,255,255,0.15)", letterSpacing: "0.08em" }}>© 2026 B V MUNENDRA</span>
         <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "rgba(255,255,255,0.15)", letterSpacing: "0.08em" }}>BUILT WITH REACT · DEPLOYED ON VERCEL</span>
       </footer>
     </div>
